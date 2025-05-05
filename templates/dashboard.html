@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">
+                    <i class="fas fa-chart-line mr-2"></i>Deepfake Detection Dashboard
+                </h1>
+                <nav>
+                    <a href="/" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-upload mr-1"></i>Upload
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- System Status -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="card bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                <i class="fas fa-microchip text-white text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">GPU Status</dt>
+                                    <dd id="gpuStatus" class="flex items-baseline">
+                                        <div class="text-lg font-semibold text-gray-900">Loading...</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                                <i class="fas fa-brain text-white text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">CNN Accuracy</dt>
+                                    <dd id="cnnAccuracy" class="flex items-baseline">
+                                        <div class="text-lg font-semibold text-gray-900">Loading...</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                                <i class="fas fa-project-diagram text-white text-xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Last Training</dt>
+                                    <dd id="lastTraining" class="flex items-baseline">
+                                        <div class="text-lg font-semibold text-gray-900">Loading...</div>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="card bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Training Progress</h3>
+                        <canvas id="trainingChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div class="card bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Model Performance</h3>
+                        <canvas id="performanceChart" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Metrics -->
+            <div class="card bg-white overflow-hidden shadow rounded-lg mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Detailed Metrics</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Model</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Accuracy</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precision</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recall</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">F1 Score</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">AUC</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metricsTable" class="bg-white divide-y divide-gray-200">
+                                <!-- Metrics will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load metrics data
+            fetch('/api/metrics')
+                .then(response => response.json())
+                .then(data => {
+                    updateDashboard(data);
+                })
+                .catch(error => {
+                    console.error('Error loading metrics:', error);
+                });
+
+            // Load GPU status
+            fetch('/api/gpu-status')
+                .then(response => response.json())
+                .then(data => {
+                    updateGpuStatus(data);
+                });
+
+            function updateDashboard(metrics) {
+                if (!metrics) {
+                    document.getElementById('metricsTable').innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No metrics data available</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // Update CNN Accuracy card
+                const cnnAccuracy = (metrics.cnn?.accuracy * 100 || 0).toFixed(1);
+                document.getElementById('cnnAccuracy').innerHTML = `
+                    <div class="text-lg font-semibold text-gray-900">${cnnAccuracy}%</div>
+                `;
+
+                // Update Last Training card
+                document.getElementById('lastTraining').innerHTML = `
+                    <div class="text-lg font-semibold text-gray-900">${metrics.system?.last_trained || 'N/A'}</div>
+                `;
+
+                // Update metrics table
+                const metricsTable = document.getElementById('metricsTable');
+                metricsTable.innerHTML = '';
+
+                if (metrics.cnn) {
+                    addMetricRow('CNN', metrics.cnn);
+                }
+                if (metrics.xgboost) {
+                    addMetricRow('XGBoost', metrics.xgboost);
+                }
+                if (metrics.yolo) {
+                    addMetricRow('YOLO', {accuracy: metrics.yolo.map, precision: 'N/A', recall: 'N/A', f1: 'N/A', auc: 'N/A'});
+                }
+
+                // Initialize charts
+                initCharts(metrics);
+            }
+
+            function addMetricRow(modelName, metrics) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${modelName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMetric(metrics.accuracy)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMetric(metrics.precision)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMetric(metrics.recall)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMetric(metrics.f1)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatMetric(metrics.auc)}</td>
+                `;
+                document.getElementById('metricsTable').appendChild(row);
+            }
+
+            function formatMetric(value) {
+                if (value === undefined || value === null) return 'N/A';
+                if (typeof value === 'string') return value;
+                return (value * 100).toFixed(1) + '%';
+            }
+
+            function updateGpuStatus(data) {
+                const gpuStatus = document.getElementById('gpuStatus');
+                if (data.gpu_available) {
+                    gpuStatus.innerHTML = `
+                        <div class="text-lg font-semibold text-gray-900">Active</div>
+                        <div class="ml-2 text-sm text-gray-500">${data.memory_used} / ${data.memory_total}</div>
+                    `;
+                } else {
+                    gpuStatus.innerHTML = `
+                        <div class="text-lg font-semibold text-gray-900">CPU Only</div>
+                    `;
+                }
+            }
+
+            function initCharts(metrics) {
+                // Training Chart
+                const trainingCtx = document.getElementById('trainingChart').getContext('2d');
+                const trainingChart = new Chart(trainingCtx, {
+                    type: 'line',
+                    data: {
+                        labels: metrics.cnn?.train_loss?.map((_, i) => `Epoch ${i + 1}`) || [],
+                        datasets: [
+                            {
+                                label: 'Training Loss',
+                                data: metrics.cnn?.train_loss || [],
+                                borderColor: '#3B82F6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Validation Loss',
+                                data: metrics.cnn?.val_loss || [],
+                                borderColor: '#10B981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Loss'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Performance Chart
+                const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+                const performanceChart = new Chart(performanceCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'AUC'],
+                        datasets: [
+                            {
+                                label: 'CNN',
+                                data: [
+                                    metrics.cnn?.accuracy || 0,
+                                    metrics.cnn?.precision || 0,
+                                    metrics.cnn?.recall || 0,
+                                    metrics.cnn?.f1 || 0,
+                                    metrics.cnn?.auc || 0
+                                ],
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)'
+                            },
+                            {
+                                label: 'XGBoost',
+                                data: [
+                                    metrics.xgboost?.accuracy || 0,
+                                    metrics.xgboost?.precision || 0,
+                                    metrics.xgboost?.recall || 0,
+                                    metrics.xgboost?.f1 || 0,
+                                    metrics.xgboost?.auc || 0
+                                ],
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + (context.raw * 100).toFixed(1) + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 1,
+                                ticks: {
+                                    callback: function(value) {
+                                        return (value * 100) + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .upload-area {
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-blue-600">
+                    <i class="fas fa-robot mr-2"></i>Deepfake Detector
+                </h1>
+                <nav>
+                    <a href="/dashboard" class="text-gray-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-chart-line mr-1"></i>Dashboard
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow flex items-center justify-center p-4">
+            <div class="w-full max-w-2xl bg-white rounded-xl shadow-md overflow-hidden p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Detect Deepfake Media</h2>
+                    <p class="text-gray-600">Upload an image to analyze for deepfake content</p>
+                </div>
+
+                <!-- Upload Form -->
+                <form id="uploadForm" class="space-y-6">
+                    <div class="upload-area border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 transition-colors duration-300"
+                         id="dropArea">
+                        <input type="file" id="fileInput" name="file" class="hidden" accept="image/*,video/*">
+                        <div class="flex flex-col items-center justify-center space-y-2">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-blue-500"></i>
+                            <p class="text-lg font-medium text-gray-700">Drag & drop your file here</p>
+                            <p class="text-sm text-gray-500">or click to browse</p>
+                            <p class="text-xs text-gray-400">Supports: JPG and PNG</p>
+                        </div>
+                    </div>
+                    <div id="fileInfo" class="hidden">
+                        <div class="flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-file text-blue-500"></i>
+                                <span id="fileName" class="font-medium"></span>
+                            </div>
+                            <button type="button" id="removeFile" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" id="submitBtn" disabled
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <i class="fas fa-search mr-2"></i> Analyze for Deepfakes
+                    </button>
+                </form>
+
+                <!-- Results Container -->
+                <div id="resultsContainer" class="hidden mt-8 p-6 bg-gray-50 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-poll mr-2"></i>Analysis Results
+                    </h3>
+                    <div id="resultsContent" class="space-y-4">
+                        <!-- Results will be inserted here by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Loading Indicator -->
+                <div id="loadingIndicator" class="hidden mt-8 text-center">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+                    <p class="text-gray-600">Analyzing your file...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white py-4 border-t">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+                <p>Deepfake Detection System powered by PyTorch, XGBoost and YOLO</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
